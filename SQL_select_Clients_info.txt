@@ -1,0 +1,48 @@
+Первая задача
+Необходимо написать один SQL запрос, возвращающий все транзакции клиента "Иванов Иван Иванович"
+по картам с номерами "1234567890123451" и "1234567890123452" совершенные за период с 01.01.2012 по 01.01.2015.
+Запрос должен вывести: номер карты, дату совершения операции, сумму транзакции.
+
+#СУБД MySQL
+SELECT CardNumber, Date, Summa FROM Cards
+LEFT JOIN Clients ON Clients.Clientid = Cards.Clientid
+LEFT JOIN Transactions ON Transactions.Cardid = Cards.Cardid
+WHERE FIO = 'Иванов Иван Иванович' AND cardnumber IN (1234567890123451, 1234567890123452)
+AND date BETWEEN '2012/01/01' and '2015/01/01';
+
+
+Вторая задача
+Необходимо написать один SQL запрос, который вернет общую сумму всех транзакций
+с разбивкой по каждой карте для клиента "Сидоров Сидор Сидорович" за весь период.
+Запрос должен вывести: номер карты, общую сумму транзакций по карте.
+
+#СУБД MySQL
+SELECT Cardnumber, SUM(Summa) FROM Cards
+LEFT JOIN Clients ON Clients.Clientid = Cards.Clientid
+LEFT JOIN Transactions ON Cards.Cardid = Transactions.Cardid
+WHERE FIO = 'Сидоров Сидор Сидорович'
+GROUP BY Cardnumber;
+
+
+Третья задача
+Удалить ошибочную транзакцию по карте "1234567890123451" от "19.06.2012  15:13:13"
+
+#СУБД MySQL
+DELETE FROM Transactions WHERE date='2012/06/19 15:13:13' AND cardid IN
+(SELECT cardid FROM Cards WHERE cardnumber=1234567890123451);
+
+
+Четвертая задача
+Вставить новую транзакцию по карте "1234567890123411" на сумму 1000 с текущей датой
+
+#СУБД MySQL
+INSERT INTO Transactions VALUES
+((SELECT cardid FROM Cards WHERE cardnumber=1234567890123411), CURDATE(), 1000);
+
+
+Пятая задача
+Обновить поле FIO клиента с картой "1234567890123458" на "Смирнов Олег Петрович";
+
+#СУБД MySQL
+UPDATE Clients SET FIO="Смирнов Олег Петрович" WHERE clientid IN
+(SELECT clientid FROM Cards WHERE cardnumber= 1234567890123458);
